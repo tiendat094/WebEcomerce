@@ -1,0 +1,151 @@
+﻿@using Shop.Model
+@model List<Category>
+
+<div class="header-area">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8">
+                <div class="user-menu">
+                    <ul>
+                       
+                       
+                        @{
+                            bool isCheckLogin = Context.Session.GetString("isCheckLogin") == "true";
+                            string totalCart = Context.Session.GetString("TotalCart");
+                            string QuantityOrder = Context.Session.GetString("QuantityOrder");
+
+                        }
+                        @if (isCheckLogin)
+                        {
+                         <li><a href="/MyAcount"><i class="fa fa-user"></i> My Account</a></li>
+                         <li><a href="/Cart"><i class="fa fa-user"></i> My Cart</a></li>
+                        <li><a href="/Login"><i class="fa fa-user"></i> Logout</a></li>
+                        }
+                        else
+                        {
+						<li><a href="/Login"><i class="fa fa-user"></i> Login</a></li>
+                        }
+                        
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="header-right">
+                    <ul class="list-unstyled list-inline">
+                        <li class="dropdown dropdown-small">
+                            <a data-toggle="dropdown" data-hover="dropdown" class="dropdown-toggle" href="#"><span class="key">currency :</span><span class="value">USD </span><b class="caret"></b></a>
+                        </li>
+
+                        <li class="dropdown dropdown-small">
+                            <a data-toggle="dropdown" data-hover="dropdown" class="dropdown-toggle" href="#"><span class="key">language :</span><span class="value">English </span><b class="caret"></b></a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> <!-- End header area -->
+
+<div class="site-branding-area">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="logo">
+                    <h1><a href="./"><img src="img/vertu.jpg"></a></h1>
+                </div>
+            </div>
+            @if (isCheckLogin)
+            {
+                <div class="col-sm-6">
+                    <div class="shopping-item">
+                        <a asp-page="/Cart">
+                            Cart - <span class="cart-amunt">@totalCart</span>
+                            <i class="fa fa-shopping-cart"></i>
+                            <span class="product-count">@QuantityOrder</span>
+                        </a>
+                    </div>
+                </div>
+            }
+            
+        </div>
+    </div>
+</div> <!-- End site branding area -->
+
+<div class="mainmenu-area">
+    <div class="container">
+        <div class="row">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+            </div>
+            <div class="navbar-collapse collapse">
+                @{
+                    string currentPath = Context.Request.Path;
+                }
+                <ul class="nav navbar-nav">
+                    @{
+                        bool isCheckAdmin = Context.Session.GetString("isCheckAdmin") == "true";
+                    }
+
+                    @if (isCheckAdmin)
+                    {
+                        <li class="@(currentPath == "/Admin" ? "active" : "")"><a href="/Admin">Admin</a></li>
+                    }
+
+                    <li class="@(currentPath == "/Index" ? "active" : "")"><a href="/Index">Home</a></li>
+                    <li class="@(currentPath == "/Shop" ? "active" : "")"><a href="/Shop">Shop page</a></li>
+                    @if (isCheckLogin)
+                    {
+                        <li class="@(currentPath == "/Cart" ? "active" : "")"><a href="/Cart">Cart</a></li>
+                    }
+
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="categoryDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Category
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="categoryDropdown">
+                            @if (Model != null && Model.Any())
+                            {
+                                @foreach (var category in Model)
+                                {
+                                    <li><a class="dropdown-item" href="/Shop?id=@category.Id">@category.Name</a></li>
+                                }
+                            }
+                            else
+                            {
+                                <li><span class="dropdown-item text-muted">No categories available</span></li>
+                            }
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div> <!-- End mainmenu area -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var dropdowns = document.querySelectorAll(".dropdown-toggle");
+        dropdowns.forEach(function (dropdown) {
+            dropdown.addEventListener("click", function (event) {
+                event.preventDefault();
+                var menu = this.nextElementSibling;
+                menu.classList.toggle("show");
+            });
+        });
+
+        // Đóng dropdown khi click ngoài
+        document.addEventListener("click", function (event) {
+            var isDropdown = event.target.matches(".dropdown-toggle") || event.target.closest(".dropdown-menu");
+            if (!isDropdown) {
+                document.querySelectorAll(".dropdown-menu").forEach(function (menu) {
+                    menu.classList.remove("show");
+                });
+            }
+        });
+    });
+</script>

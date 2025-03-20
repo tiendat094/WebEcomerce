@@ -1,0 +1,28 @@
+﻿# Bỏ qua thư mục .vs của Visual Studio
+.vs/
+.vscode/
+*.suo
+*.user
+*.cache
+*.pdb
+*.log
+*.tlog
+*.VC.db
+*.VC.opendb
+
+# Bỏ qua file build
+bin/
+obj/
+Debug/
+Release/
+
+# Bỏ qua file cấu hình môi trường
+appsettings.Development.json
+appsettings.Local.json
+secrets.json
+*.config
+
+# Bỏ qua file khóa và backup
+*.lock
+*.bak
+Thumbs.db

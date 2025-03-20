@@ -1,0 +1,169 @@
+﻿@page
+@model Shop.Pages.MyAcountModel
+@{
+    ViewData["Title"] = "Hồ Sơ Của Tôi";
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Hồ Sơ Của Tôi</title>
+
+    <link rel="stylesheet" href="~/css/bootstrap.min.css">
+    <link rel="stylesheet" href="~/css/font-awesome.min.css">
+    <link rel="stylesheet" href="~/style.css">
+    <link rel="stylesheet" href="~/css/responsive.css">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            width: 50%;
+            margin: auto;
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 5px;
+        }
+
+        .profile-pic {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+            .profile-pic img {
+                width: 80px;
+                height: 80px;
+                border-radius: 50%;
+                background-color: #f2f2f2;
+            }
+
+        .form-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+            .form-group label {
+                font-weight: bold;
+                width: 150px;
+            }
+
+            .form-group input {
+                flex: 1;
+                padding: 8px;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+            }
+
+            .form-group span {
+                flex: 1;
+            }
+
+        .btn-save {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+            .btn-save:hover {
+                background-color: #c0392b;
+            }
+
+        .change-link {
+            color: blue;
+            cursor: pointer;
+        }
+    </style>
+
+    <script>
+        function triggerFileInput() {
+            document.getElementById("imageUpload").click();
+        }
+
+        function uploadImage(event) {
+            let file = event.target.files[0];
+            if (!file) {
+                alert("Vui lòng chọn một ảnh!");
+                return;
+            }
+
+            let formData = new FormData();
+            formData.append("file", file);
+            formData.append("upload_preset", "shopEcommerce");
+
+            fetch("https://api.cloudinary.com/v1_1/dodaeo6wb/image/upload", {
+                method: "POST",
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.secure_url) {
+                        document.getElementById("avatar").src = data.secure_url;
+                        document.getElementById("AvatarUrl").value = data.secure_url;
+                        alert("Upload thành công!");
+                    } else {
+                        alert("Upload thất bại! Xem lỗi trong console.");
+                        console.error("Lỗi upload:", data);
+                    }
+                })
+                .catch(error => console.error("Lỗi khi upload ảnh:", error));
+        }
+    </script>
+</head>
+
+<body>
+    @await Html.PartialAsync("_Header", Model.Categories)
+
+    <div class="container">
+        <h2>Hồ Sơ Của Tôi</h2>
+        <p>Quản lý thông tin hồ sơ để bảo mật tài khoản</p>
+
+        <form method="post" asp-page-handler="UpdateUser">
+            <div class="form-group">
+                <label>Tên</label>
+                <input type="text" name="UserName" value="@Model.User.UserName">
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="text" name="EmailAddress" value="@Model.User.EmailAddress">
+            </div>
+            <div class="form-group">
+                <label>Số điện thoại</label>
+                <input type="text" name="PhoneNumber" value="@Model.User.PhoneNumber">
+            </div>
+            <div class="form-group">
+                <label>Giới tính</label>
+                <select name="Gender">
+                    <option value="0" selected="@((Model.User.sex == Shop.Model.Sex.Male) ? "selected" : null)">Nam</option>
+                    <option value="1" selected="@((Model.User.sex == Shop.Model.Sex.FeMale) ? "selected" : null)">Nữ</option>
+                    <option value="2" selected="@((Model.User.sex == Shop.Model.Sex.Other) ? "selected" : null)">Khác</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Ngày sinh</label>
+                <input type="date" name="BirthDay" value="@Model.User.BirthDay?.ToString("yyyy-MM-dd")">
+            </div>
+
+            <div class="profile-pic">
+                <img id="avatar" src="@Model.User.AvatarUrl" alt="Avatar">
+                <div>
+                    <button type="button" class="btn-save" onclick="triggerFileInput()">Chọn Ảnh</button>
+                    <p>Dung lượng file tối đa 1 MB<br>Định dạng: JPEG, PNG</p>
+                    <input type="file" id="imageUpload" accept="image/*" style="display: none;" onchange="uploadImage(event)">
+                    <input type="hidden" name="AvatarUrl" id="AvatarUrl" value="@Model.User.AvatarUrl">
+                </div>
+            </div>
+
+            <button type="submit" class="btn-save" >Lưu</button>
+        </form>
+    </div>
+
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+</body>
+</html>
